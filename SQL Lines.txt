@@ -1,0 +1,99 @@
+##Employee Total Sales
+
+select e.employeeid, e.firstname, e.lastname, e.hiredate, o.orderdate, od.productid, od.unitprice unitprice, od.quantity quantity, sum(quantity*unitprice) as sum_sales
+from Employees e
+join orders o
+on o.employeeid = e.employeeid
+join orderdetails od
+on od.orderid = o.orderid
+group by e.employeeid
+order by sum_sales desc
+
+
+
+##Employee Rockstars
+
+
+select e.employeeid employeeid, e.lastname lastname, sum(od.quantity*od.unitprice) sum_sales2016
+from Employees e
+join orders o
+on o.employeeid = e.employeeid
+join orderdetails od
+on od.orderid = o.orderid
+join products p
+on p.productid = od.productid
+where o.orderdate between '2016-01-01' and '2016-12-31'
+group by lastname
+order by sum_sales2016 desc
+
+select e.employeeid employeeid, e.lastname lastname, sum(od.quantity*od.unitprice) sum_sales2015
+from Employees e
+join orders o
+on o.employeeid = e.employeeid
+join orderdetails od
+on od.orderid = o.orderid
+join products p
+on p.productid = od.productid
+where o.orderdate between '2015-01-01' and '2015-12-31'
+group by lastname
+order by sum_sales2015 desc
+
+select e.employeeid employeeid, e.firstname, e.lastname lastname, sum(od.quantity*od.unitprice) sum_sales2014
+from Employees e
+join orders o
+on o.employeeid = e.employeeid
+join orderdetails od
+on od.orderid = o.orderid
+join products p
+on p.productid = od.productid
+where o.orderdate between '2014-01-01' and '2014-12-31'
+group by lastname
+order by sum_sales2014 desc
+
+
+
+##Sales Leader per Product ID
+
+
+
+with table1 as(select e.employeeid ID, e.lastname lastname, od.productid productid, p.productname productname, (od.quantity*od.unitprice) sales
+from Employees e
+join orders o
+on o.employeeid = e.employeeid
+join orderdetails od
+on od.orderid = o.orderid
+join products p
+on p.productid = od.productid
+group by productname, lastname)
+
+select id, lastname, productid, productname,
+max(sales) max_sales
+from table1
+group by productname
+
+
+
+##Leader in most productID’s
+
+
+with table1 as(select e.employeeid ID, e.lastname lastname, od.productid productid, p.productname productname, (od.quantity*od.unitprice) sales
+from Employees e
+join orders o
+on o.employeeid = e.employeeid
+join orderdetails od
+on od.orderid = o.orderid
+join products p
+on p.productid = od.productid
+group by productname, lastname),
+
+table2 as (select id, lastname, productid, productname, max(sales) max_sales
+from table1
+group by productname)
+
+select lastname, count(max_sales)
+from table2
+group by lastname
+
+
+
+
